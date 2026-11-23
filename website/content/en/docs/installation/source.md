@@ -57,3 +57,19 @@ tar czf lima-additional-guestagents-package.tar.gz *
 ```
 
 These packages can then be transferred and installed on the target system.
+
+### Building a Debian package
+
+On a native Linux build host, install the Debian packaging tools and run:
+
+```bash
+sudo apt-get install dpkg-dev
+make deb
+```
+
+The package is written to `_artifacts/lima-<version>-<architecture>.deb` and includes
+the native Lima binaries, templates, guest agent, documentation, and manpages. Install it with:
+
+```bash
+sudo apt install ./_artifacts/lima-<version>-<architecture>.deb
+```

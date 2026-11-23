@@ -183,6 +183,7 @@ help-artifact:
 	@echo  'Targets for miscellaneous artifacts:'
 	@echo  '- artifacts-jsonschema      : Build artifacts for schema-limayaml.json'
 	@echo  '- artifacts-misc            : Build artifacts for go.mod, go.sum, and vendor'
+	@echo  '- deb                       : Build a native Linux Debian package in _artifacts/'
 
 ################################################################################
 # convenience targets
@@ -191,6 +192,14 @@ exe: _output/bin/limactl$(exe)
 .PHONY: minimal native
 minimal: clean limactl native-guestagent default_template
 native: clean limactl limactl-plugins lima-privileged-net helpers native-guestagent templates template_experimentals additional-drivers
+
+################################################################################
+# Debian package
+.PHONY: deb
+deb: native | _artifacts
+	@if [ "$(GOOS)" != "linux" ]; then echo "deb must be built with GOOS=linux" >&2; exit 1; fi
+	@DEB_ARCH=$$(case "$(GOARCH)" in amd64) echo amd64;; arm64) echo arm64;; *) echo "unsupported GOARCH: $(GOARCH)" >&2; exit 1;; esac); \
+		hack/build-deb.sh "$(VERSION_TRIMMED)" "$$DEB_ARCH" "_artifacts/lima-$(VERSION_TRIMMED)-$$DEB_ARCH.deb"
 
 ################################################################################
 # These configs were once customizable but should no longer be changed.
